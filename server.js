@@ -12,4 +12,7 @@ app.use(express.json(), express.urlencoded({ extended: true }));
 const AllMyUserRoutes = require("./server/routes/user.routes");
 AllMyUserRoutes(app);
 
+const AllMyEventRoutes = require("./server/routes/event.routes");
+AllMyEventRoutes(app)
+
 app.listen(8000, () => console.log("The server is all fired up on port 8000"));

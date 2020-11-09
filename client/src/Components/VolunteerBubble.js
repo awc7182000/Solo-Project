@@ -1,77 +1,108 @@
 import React, {useState,useEffect} from 'react';
-import {Link} from '@reach/router';
-import Table from 'react-bootstrap/Table'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import {Link, useLocation} from '@reach/router';
 import Button from 'react-bootstrap/Button'
 import axios from 'axios'
 import Mainlogo from './Mainlogo.png'
-import Switch from '@material-ui/core/Switch';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import {navigate} from '@reach/router'
 import InputGroup from 'react-bootstrap/InputGroup'
-import FormControl from 'react-bootstrap/InputGroup'
+import FormControl from 'react-bootstrap/FormControl'
+import Capture from './Capture.PNG'
+import { v4 as uuidv4 } from 'uuid';
 export default (props) => {
-    const[checked1,setChecked1] = React.useState(false);
-    const[checked2,setChecked2] = React.useState(false);
-    const[checked3,setChecked3] = React.useState(false);
-    const[checked4,setChecked4] = React.useState(false);
-    
-    
-    const planningCommitee = () => {
-      setChecked1((prev) => !prev);
-    };
-    
-    const weekBefore = () => {
-      setChecked2((prev) => !prev);
-    };
-  
-    const dayOf = () => {
-      setChecked3((prev) => !prev);
-    };
+    const[event, setEvent] = React.useState({});
+    const[name,setName] = useState("");
+    const[email,setEmail] = useState("");
+    const[phone,setPhone] = useState();
+    const[address,setAddress] = useState("");
+    const[whoopsie,setWhoopsie] = useState("");
+    const location = useLocation();
 
-    const event = () => {
-      setChecked4((prev) => !prev);
-    };
+    useEffect(() => {
+      console.log(props.id);
+      
+      axios.get('http://localhost:8000/api/events/'+props.id)
+      .then(res => {
+          console.log(res.data);
+          setEvent(res.data.Event);
+      })
+      .catch((error) => {
+          console.log(error);
+        })
+    },[]) ;
+    const onSubmitHandler = (e) => {
+      e.preventDefault();
+      event.volunteers.push({name:name,email:email,phone:phone,address:address})
+      axios.put("http://localhost:8000/api/events/update/"+props.id,event)
+      .then(res => {
+          if(res.data.error) {
+              console.log(res.data.error.errors);
+              setWhoopsie(res.data.error.errors);
+          }
+          else{
+              navigate('/')
+          }
+      })
+      .catch((error) => {
+          console.log(error);
+      })
+  }
+
+    //on submit method get values from input fields, wrap in object {FirstName: "Ryan", etc} then add this object to volunteers for event
+    //event.volunteers.push(yourObject)
+    //call put on that event with updated data
 
     return(
-        <div>
+        <form onSubmit={onSubmitHandler}>
             <img class ="admin" src={Mainlogo} alt="logo"></img>
-            <Link className="adminLogin"to="/events/">Go back</Link><br/>
-            <ButtonGroup style={{borderColor:'#6a6d6d',height:20}} size="lg" className="mb-2">
-            <Link to="/volunteer/bubble/"><Button style={{backgroundColor:'#57c1cf',border:0}}>Bubble Blast</Button></Link>
-            <Link to="/volunteer/golf/"><Button style={{backgroundColor:'#57b549',border:0}}>Golf Event</Button></Link>
-    <Link to="/volunteer/annual/"><Button style={{backgroundColor:'#655a9f',border:0}}>Annual Event</Button></Link>
-    <Link to="/volunteer/office/"><Button style={{backgroundColor:'#3e2e67',border:0}}>Office Admin</Button></Link>
-    <Link to="/volunteer/kindness/"><Button style={{backgroundColor:'#fbbc00',border:0}}>Kindness courier</Button></Link>
-    <Link to="/volunteer/fundraiser/"><Button style={{backgroundColor:'#bb368b',border:0}}>Fund raiser</Button></Link>
-  </ButtonGroup>
-    <h2 style={{marginTop:20}}>What kind of jobs would you like to do for Bubble Blast!</h2>
-    <FormGroup class="switch">
-  <FormControlLabel style={{display:"block"}}
-    control={<Switch checked={checked1} onChange={planningCommitee} />}
-    label="Planning Commitee"
-  />
-  <FormControlLabel style={{display:"block"}}
-    control={<Switch checked={checked2} onChange={weekBefore} />}
-    label="Week before setup"
-  />
-  <FormControlLabel style={{display:"block"}}
-    control={<Switch checked={checked3} onChange={dayOf} />}
-    label="Day-of setup/tear down"
-  />
-  <FormControlLabel style={{display:"block"}}
-    control={<Switch checked={checked4} onChange={event} />}
-    label="Event"
-  />
-</FormGroup>
-<div>
-<InputGroup className="add">
-    <InputGroup.Prepend>
-      <InputGroup.Text className="add">Anything to add?</InputGroup.Text>
-    </InputGroup.Prepend>
-    <FormControl className="text" as="textarea" aria-label="With textarea" />
-  </InputGroup></div>
-  <input style={{marginTop:20}} type="submit"></input>
-        </div>
+            <Link className="adminLogin"to="/">Go back</Link><br/>
+    <h2 >Please enter your information for {event.name}</h2>
+    <InputGroup className="mb-3">
+  <InputGroup.Append>
+      <InputGroup.Text id="basic-addon2">First and Last name</InputGroup.Text>
+    </InputGroup.Append>
+    <FormControl onChange = {e => setName(e.target.value)}
+      placeholder=""
+      aria-label=""
+      aria-describedby="basic-addon2"
+    />
+  </InputGroup>
+
+  <InputGroup className="mb-3">
+  <InputGroup.Append>
+      <InputGroup.Text id="basic-addon2">Email</InputGroup.Text>
+    </InputGroup.Append>
+    <FormControl onChange = {e => setEmail(e.target.value)}
+      placeholder=""
+      aria-label=""
+      aria-describedby="basic-addon2"
+    />
+  </InputGroup>
+
+  <InputGroup className="mb-3">
+  <InputGroup.Append>
+      <InputGroup.Text id="basic-addon2">Phone Number</InputGroup.Text>
+    </InputGroup.Append>
+    <FormControl onChange = {e => setPhone(e.target.value)}
+      placeholder=""
+      aria-label=""
+      aria-describedby="basic-addon2"
+    />
+  </InputGroup>
+
+  <InputGroup className="mb-3">
+  <InputGroup.Append>
+      <InputGroup.Text id="basic-addon2">Address</InputGroup.Text>
+    </InputGroup.Append>
+    <FormControl onChange = {e => setAddress(e.target.value)}
+      placeholder=""
+      aria-label=""
+      aria-describedby="basic-addon2"
+    />
+  </InputGroup>
+
+  <Button variant="success" style={{marginTop:20}} type="submit">Submit</Button>
+  <h4 style={{marginTop:40}}>If you have anything else to add, contact us below!</h4>
+  <img class="Events1"src={Capture} alt="footer"></img>
+        </form>
     )
 }
