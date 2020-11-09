@@ -10,7 +10,6 @@ import Button from 'react-bootstrap/Button'
 import Capture from './Capture.PNG'
 
 export default(props) => {
-  const {isAuthenticated} = useAuth0();
   const[events,setEvents] = useState([]);
 
   useEffect(() => {
@@ -25,7 +24,6 @@ export default(props) => {
   },[]) ;
   
 return( 
-  isAuthenticated && (
   <div className="Events">
     <header className="Volunteer-top">
     <img className="mainlogo"src = {Heart}alt="heart"/>
@@ -51,5 +49,5 @@ return(
       ))}
 </CardDeck> <br/>
 </div>
-))
+)
 }
